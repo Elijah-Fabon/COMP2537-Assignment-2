@@ -1,0 +1,37 @@
+############
+# MongoDB  #
+############
+- I. Introduction
+  - A. What is MongoDB?
+
+- II. Getting started with MongoDB
+  - A. Installation
+  - B. Starting the MongoDB server
+  - C. Connecting to MongoDB
+
+- III. CRUD Operations in MongoDB
+  - A. Inserting Data
+  - B. Querying Data
+  - C. Updating Data
+  - D. Deleting Data
+  
+
+############
+# Mongoose #
+############
+- I. Introduction to Mongoose
+  - A. What is Mongoose?
+  - B. Advantages of using Mongoose
+  - C. How Mongoose works with MongoDB
+
+- II. Getting Started with Mongoose
+  - A. Installation @done
+  - B. Connecting to MongoDB @done
+  - C. Defining a Mongoose schema @done
+  - D. Creating a Mongoose model @done
+
+- III. CRUD Operations with Mongoose
+  - A. Creating a new document @done
+  - B. Reading documents @done
+  - C. Updating documents
+  - D. Deleting documents

@@ -1,0 +1,23 @@
+- Express Application 
+  - app.listen @done
+  - app.get @done
+  - app.post
+  - app.put
+  - app.delete
+- Express Request
+  - req.params
+  - req.query
+  - req.body 
+- Express Response 
+  - res.send @done
+  - res.json @done
+  - res.render 
+  - res.redirect 
+  - res.status @done
+- Express Middleware 
+  - app.use @done
+- Express Templates 
+  - res.render 
+  - ejs or pug 
+- Express Session
+    - req.session @done

@@ -1,0 +1,8 @@
+- MongoDB 
+- Node.js/Express.js @done
+- Cookies and Sessions @done
+- Authentication (logins) @done
+- Autherization (logins) @done
+- BCrypt hashing passwords @done
+- NoSQL Injection Attacks
+- Hosting @done
