@@ -41,9 +41,15 @@ app.use(session({
 
 // public routes
 app.get('/', (req, res) => {
-  res.send(`<h1> Hello World </h1>
+  if (!req.session.GLOBAL_AUTHENTICATED) {
+    res.send(`<h1> Hello World </h1>
   <a href="/login">Login</a>
   <a href="/signUp">Sign Up</a>`);
+  } else {
+    res.send(`<h1> Hello World </h1>
+    <a href="/login">Login</a>
+    <a href="/signUp">Sign Up</a>`);
+  }
 });
 
 
@@ -152,8 +158,19 @@ app.post("/signUp", async (req, res) => {
   });
   console.log("Inserted user");
 
-  res.send(`successfully created user
-  <a href="/login">Login</a>`);
+  try {
+    const result = await usersModel.findOne({
+      email: req.body.email
+    })
+      req.session.GLOBAL_AUTHENTICATED = true;
+      req.session.loggedUsername = result?.username;
+      req.session.loggedPassword = req.body.password;
+      req.session.cookie.expires = new Date(Date.now() + expireTime);
+      res.redirect('/members');
+      console.log(GLOBAL_AUTHENTICATED);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 // only for authenticated users
