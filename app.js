@@ -5,6 +5,10 @@ const usersModel = require('./models/w1users');
 const bcrypt = require('bcrypt');
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * milliseconds)
 const saltRounds = 12;
+// 1 - import 
+let ejs = require('ejs');
+// 2 - set the view engine to ejs
+// app.set('view engine', 'ejs')
 
 var MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -47,8 +51,8 @@ app.get('/', (req, res) => {
   <a href="/signUp">Sign Up</a>`);
   } else {
     res.send(`<h1> Hello World </h1>
-    <a href="/login">Login</a>
-    <a href="/signUp">Sign Up</a>`);
+    <a href="/members">Members</a>
+    <a href="/logout">Logout</a>`);
   }
 });
 
@@ -167,7 +171,6 @@ app.post("/signUp", async (req, res) => {
       req.session.loggedPassword = req.body.password;
       req.session.cookie.expires = new Date(Date.now() + expireTime);
       res.redirect('/members');
-      console.log(GLOBAL_AUTHENTICATED);
   } catch (error) {
     console.log(error);
   }
@@ -184,19 +187,28 @@ app.use(authenticatedOnly);
 
 app.use(express.static('public')) // built-in middleware function in Express. It serves static files and is based on serve-static.
 
-app.get('/members', (req, res) => {
+app.get('/members', async (req, res) => {
   // serve one of the three images randomly
   // generate a random number between 1 and 3
   const randomImageNumber = Math.floor(Math.random() * 9) + 1;
   const imageName = `00${randomImageNumber}.png`;
-  HTMLResponse = `
-    <h1> Hello ${req.session.loggedUsername} </h1>
-    <br>
-    <img src="${imageName}" />
-    <br>
-    <a href="/logout">Logout</a>
-    `
-  res.send(HTMLResponse);
+  // HTMLResponse = `
+  //   <h1> Hello ${req.session.loggedUsername} </h1>
+  //   <br>
+  //   <img src="${imageName}" />
+  //   <br>
+  //   <a href="/logout">Logout</a>
+  //   `
+  // res.send(HTMLResponse);
+
+  const result = await usersModel.findOne({ username: req.session.loggedUsername });
+  res.render('protectedRoute.ejs', {
+    "x": req.session.loggedUsername,
+    "y": imageName,
+    "isAdmin": req.session.loggedType == 'administrator',
+    "todos":result?.todos
+  }
+  )
 });
 
 app.get("/logout", (req, res) => {
@@ -206,6 +218,51 @@ app.get("/logout", (req, res) => {
     <a href='/'>Home</a>
     `;
   res.send(html);
+});
+
+app.post('/addNewTodoItem', async (req, res) => {
+  const result = await usersModel.updateOne(
+    { username: req.session.loggedUsername },
+    { $push: { todos: {
+      "name": req.body.newItemLabel
+    } 
+  } 
+}
+  )
+  res.redirect('/members');
+});
+
+app.post('/deleteTodoItem', async (req, res) => {
+  const result = await usersModel.updateOne(
+    { username: req.session.loggedUsername });
+  
+  const newArr = result.todos = result.todos.filter((item) => {
+      return item.name != req.body.x;
+    });
+
+  const updatedResult = await usersModel.updateOne(
+    { username: req.session.loggedUsername },
+    { $set: { todos: newArr } }
+  )
+
+  res.redirect('/members');
+});
+
+app.post('/updateTodoItem', async (req, res) => {
+  const result = await usersModel.findOne({ username: req.session.loggedUsername });
+
+  const newArr = result.todos.map((todoItem) => {
+    if (todoItem.name == req.body.x) {
+      todoItem.done = !todoItem.done;
+    }
+    return todoItem;
+  });
+
+  const updatedResult = await usersModel.updateOne(
+    { username: req.session.loggedUsername },
+    { $set: { todos: newArr } }
+  );
+  res.redirect('/members');
 });
 
 // only for admins

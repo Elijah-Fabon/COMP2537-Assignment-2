@@ -13,17 +13,27 @@
 use('comp2537w1');
 
 // Insert a few documents into the sales collection.
-// db.getCollection('w1users').insertMany([
-//   {
-//     username: 'admin',
-//     password: 'admin',
-//     type: 'administrator'
-//   },
-//   {
-//     username: 'user1',
-//     password: 'pass1',
-//     type: 'non-administrator'
-//   }
-// ]);
+db.getCollection('w1users').insertMany([
+  {
+    username: 'admin',
+    password: 'admin',
+    type: 'administrator',
+    todos: [
+      { name: "todo1", done: false },
+      { name: "todo2", done: true },
+      { name: "todo3", done: false }
+    ]
+  },
+  {
+    username: 'user1',
+    password: 'pass1',
+    type: 'non-administrator',
+    todos: [
+      { name: "todo1", done: false },
+      { name: "todo2", done: true },
+      { name: "todo3", done: false }
+    ]
+  }
+]);
 
 db.w1users.find()

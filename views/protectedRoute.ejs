@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- import bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+</head>
+<body>
+  <%- include('partials/header.ejs'); %>
+  Hello <%= x %>!
+  <br>
+  <img src="<%= y %>" />
+  <br>
+  <a href="/logout">Logout</a>
+
+  <% if (isAdmin) { %>
+  <h2> Only admins can see this</h2>
+  <% } %>
+  <ul>
+    <% todos.forEach(function(todoItem){ %>
+      <li>
+        <ul>
+          <li>
+            <%= todoItem.name %>
+          </li>
+          <li>
+            <%= todoItem.done %>
+          </li>
+          <li>
+            <form action="deleteTodoItem" method="post">
+              <input type="hidden" name=" x " value="<%= todoItem.name %>"> </input>
+              <input type="submit" value="Delete">
+            </form>
+          </li>
+          <li>
+            <form action="updateTodoItem" method="post">
+              <input type="hidden" name=" x " value="<%= todoItem.name %>"> </input>
+              <input type="submit" value="Flip">
+            </form>
+          </li>
+      </li>
+  </ul>
+  </li>
+  <% }); %>
+    </ul>
+
+
+    <form action="addNewTodoItem" method="post">
+      <label for="*">Add new list item</label>
+      <input type="text" name="todoName" placeholder="Enter todo name">
+      <input type="submit" value="Add Todo">
+    </form>
+  <%- include('partials/footer.ejs'); %>
+</body>
+</html>
