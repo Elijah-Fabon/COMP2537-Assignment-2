@@ -1,0 +1,8 @@
+<%- include('partials/header.ejs'); %>
+Login
+<form action="/login" method="post">
+  <input name='email' type='email' placeholder='Enter your email'>
+  <input type="password" name="password" placeholder="Enter your password" />
+  <input type="submit" value="Login" />
+</form>
+<%- include('partials/footer.ejs'); %>

@@ -8,7 +8,7 @@ const saltRounds = 12;
 // 1 - import 
 let ejs = require('ejs');
 // 2 - set the view engine to ejs
-// app.set('view engine', 'ejs')
+app.set('view engine', 'ejs')
 
 var MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -46,40 +46,20 @@ app.use(session({
 // public routes
 app.get('/', (req, res) => {
   if (!req.session.GLOBAL_AUTHENTICATED) {
-    res.send(`<h1> Hello World </h1>
-  <a href="/login">Login</a>
-  <a href="/signUp">Sign Up</a>`);
+    res.render('index.ejs');
   } else {
-    res.send(`<h1> Hello World </h1>
-    <a href="/members">Members</a>
-    <a href="/logout">Logout</a>`);
+    res.render('indexLoggedIn.ejs');
   }
 });
 
 
 app.get('/login', (req, res) => {
-  res.send(`
-    Login
-    <form action="/login" method="post">
-      <input name='email' type='email' placeholder='Enter your email'>
-      <input type="password" name="password" placeholder="Enter your password" />
-      <input type="submit" value="Login" />
-    </form>
-  `)
+  res.render('login.ejs');
 
 });
 
 app.get("/signUp", (req, res) => {
-  var html = `
-  create user
-  <form action='/signUp' method='post'>
-    <input name='username' type='text' placeholder='username'>
-    <input name='email' type='email' placeholder='email'>
-    <input name='password' type='password' placeholder='password'>
-    <input type="submit" value="Signup" />
-  </form>
-  `;
-  res.send(html);
+  res.render('signUp.ejs');
 });
 
 // GLOBAL_AUTHENTICATED = false;
@@ -281,11 +261,11 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
 app.get('/protectedRouteForAdminsOnly', (req, res) => {
-  res.send('<h1> protectedRouteForAdminsOnly </h1>');
+  res.render('protectedRouteForAdminsOnly.ejs')
 });
 
 app.get('*', (req, res) => {
-  res.status(404).send('<h1> 404 Page not found</h1>');
+  res.status(404).render('404.ejs');
 });
 
 
