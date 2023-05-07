@@ -1,5 +1,6 @@
   <%- include('partials/header.ejs'); %>
-  Hello <%= x %>!
+  <div class="container">
+  <h1>Hello <%= x %>!</h1>
   <br>
   <img src="<%= y %>" />
   <br>
@@ -42,4 +43,5 @@
       <input type="text" name="todoName" placeholder="Enter todo name">
       <input type="submit" value="Add Todo">
     </form>
+  </div>
   <%- include('partials/footer.ejs'); %>

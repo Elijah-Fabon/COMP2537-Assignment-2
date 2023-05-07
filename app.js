@@ -1,3 +1,4 @@
+// const url = require('url');
 const express = require('express');
 const app = express();
 const session = require('express-session');
@@ -9,6 +10,14 @@ const saltRounds = 12;
 let ejs = require('ejs');
 // 2 - set the view engine to ejs
 app.set('view engine', 'ejs')
+
+const navLinks = [
+  {name: "Home", link: "/"},
+  {name: "Members", link: "/members"},
+  {name: "Admin", link: "/admin"},
+  {name: "Login", link: "/login"},
+  {name: "Sign Up", link: "/signUp"}
+]
 
 var MongoDBStore = require('connect-mongodb-session')(session);
 
@@ -46,20 +55,22 @@ app.use(session({
 // public routes
 app.get('/', (req, res) => {
   if (!req.session.GLOBAL_AUTHENTICATED) {
-    res.render('index.ejs');
+    res.render('index.ejs',
+    {navLinks: navLinks});
   } else {
-    res.render('indexLoggedIn.ejs');
+    res.render('indexLoggedIn.ejs',
+    {navLinks: navLinks});
   }
 });
 
 
 app.get('/login', (req, res) => {
-  res.render('login.ejs');
+  res.render('login.ejs', {navLinks: navLinks});
 
 });
 
 app.get("/signUp", (req, res) => {
-  res.render('signUp.ejs');
+  res.render('signUp.ejs', {navLinks: navLinks});
 });
 
 // GLOBAL_AUTHENTICATED = false;
@@ -186,7 +197,8 @@ app.get('/members', async (req, res) => {
     "x": req.session.loggedUsername,
     "y": imageName,
     "isAdmin": req.session.loggedType == 'administrator',
-    "todos":result?.todos
+    "todos":result?.todos, 
+    "navLinks": navLinks
   }
   )
 });
@@ -260,12 +272,12 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
 };
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
-app.get('/protectedRouteForAdminsOnly', (req, res) => {
-  res.render('protectedRouteForAdminsOnly.ejs')
+app.get('/admin', (req, res) => {
+  res.render('protectedRouteForAdminsOnly.ejs', {navLinks: navLinks, currentURL: url.parse(req.url).pathname})
 });
 
 app.get('*', (req, res) => {
-  res.status(404).render('404.ejs');
+  res.status(404).render('404.ejs', {navLinks: navLinks});
 });
 
 
