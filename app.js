@@ -209,11 +209,12 @@ app.get('/members', async (req, res) => {
 
 app.get("/logout", (req, res) => {
   req.session.destroy();
-  var html = `
-    You are logged out.
-    <a href='/'>Home</a>
-    `;
-  res.send(html);
+  // var html = `
+  //   You are logged out.
+  //   <a href='/'>Home</a>
+  //   `;
+  // res.send(html);
+  res.redirect('/');
 });
 
 app.post('/addNewTodoItem', async (req, res) => {
