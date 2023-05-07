@@ -181,8 +181,10 @@ app.use(express.static('public')) // built-in middleware function in Express. It
 app.get('/members', async (req, res) => {
   // serve one of the three images randomly
   // generate a random number between 1 and 3
-  const randomImageNumber = Math.floor(Math.random() * 9) + 1;
-  const imageName = `00${randomImageNumber}.png`;
+  const randomImageNumber = Math.floor(Math.random() * 7) + 1;
+  const imageName1 = `00${randomImageNumber}.png`;
+  const imageName2 = `00${randomImageNumber + 1}.png`;
+  const imageName3 = `00${randomImageNumber + 2}.png`;
   // HTMLResponse = `
   //   <h1> Hello ${req.session.loggedUsername} </h1>
   //   <br>
@@ -195,7 +197,9 @@ app.get('/members', async (req, res) => {
   const result = await usersModel.findOne({ username: req.session.loggedUsername });
   res.render('protectedRoute.ejs', {
     "x": req.session.loggedUsername,
-    "y": imageName,
+    "y": imageName1,
+    "z": imageName2,
+    "w": imageName3,
     "isAdmin": req.session.loggedType == 'administrator',
     "todos":result?.todos, 
     "navLinks": navLinks
