@@ -170,7 +170,7 @@ app.post("/signUp", async (req, res) => {
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
   if (!req.session.GLOBAL_AUTHENTICATED) {
-    return res.redirect('/');
+    return res.redirect('/login');
   }
   next(); // allow the next route to run
 };
