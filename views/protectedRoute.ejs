@@ -16,11 +16,19 @@
     </div>
   </div>
   <br>
-  <a href="/logout">Logout</a>
+  <a href="/logout" class="btn btn-primary">Logout</a>
 
   <% if (isAdmin) { %>
   <h2> Only admins can see this</h2>
+  <a href="/admin" class="btn btn-primary">Admin</a>
   <% } %>
+
+  <form action="addNewTodoItem" method="post">
+    <label for="*">Add new list item</label>
+    <input type="text" name="todoName" placeholder="Enter todo name">
+    <input type="submit" value="Add Todo">
+  </form>
+
   <ul>
     <% todos.forEach(function(todoItem){ %>
       <li>
@@ -49,11 +57,5 @@
   <% }); %>
     </ul>
 
-
-    <form action="addNewTodoItem" method="post">
-      <label for="*">Add new list item</label>
-      <input type="text" name="todoName" placeholder="Enter todo name">
-      <input type="submit" value="Add Todo">
-    </form>
   </div>
   <%- include('partials/footer.ejs'); %>

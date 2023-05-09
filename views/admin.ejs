@@ -1,5 +1,12 @@
 <%- include('partials/header.ejs'); %>
 <div class="container">
 <h1> Admins Page </h1>
+<a href="/members" class="btn btn-primary">Members</a>
+<div>Users:</div>
+<ul>
+  <% for(let i=0; i < users.length; i++) { %>
+  <%- include('partials/users.ejs', {user: users[i]}); %>
+  <% } %>
+</ul>
 </div>
 <%- include('partials/footer.ejs'); %>

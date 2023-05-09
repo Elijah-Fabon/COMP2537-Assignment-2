@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const session = require('express-session');
+const ObjectId = require('mongodb').ObjectId;
 const usersModel = require('./models/w1users');
 const bcrypt = require('bcrypt');
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * milliseconds)
@@ -55,22 +56,21 @@ app.use(session({
 // public routes
 app.get('/', (req, res) => {
   if (!req.session.GLOBAL_AUTHENTICATED) {
-    res.render('index.ejs',
+    return res.render('index.ejs',
     {navLinks: navLinks});
   } else {
-    res.render('indexLoggedIn.ejs',
+    return res.render('indexLoggedIn.ejs',
     {navLinks: navLinks});
   }
 });
 
 
 app.get('/login', (req, res) => {
-  res.render('login.ejs', {navLinks: navLinks});
-
+  return res.render('login.ejs', {navLinks: navLinks});
 });
 
 app.get("/signUp", (req, res) => {
-  res.render('signUp.ejs', {navLinks: navLinks});
+  return res.render('signUp.ejs', {navLinks: navLinks});
 });
 
 // GLOBAL_AUTHENTICATED = false;
@@ -105,14 +105,13 @@ app.post('/login', async (req, res) => {
 
     if (bcrypt.compareSync(req.body.password, result?.password)) {
       req.session.GLOBAL_AUTHENTICATED = true;
+      req.session.loggedType = result?.type;
       req.session.loggedUsername = result?.username;
       req.session.loggedPassword = req.body.password;
       req.session.cookie.expires = new Date(Date.now() + expireTime);
       res.redirect('/members');
-      console.log(GLOBAL_AUTHENTICATED);
     } else {
-      res.send(`wrong email/password
-      <a href="/login">Try Again</a>`)
+      res.render('wrongPassword.ejs', {navLinks: navLinks})
       
     }
 
@@ -149,7 +148,7 @@ app.post("/signUp", async (req, res) => {
     username: username,
     email: email,
     password: hashedPassword,
-    type: "non-administrator"
+    type: "user"
   });
   console.log("Inserted user");
 
@@ -158,6 +157,7 @@ app.post("/signUp", async (req, res) => {
       email: req.body.email
     })
       req.session.GLOBAL_AUTHENTICATED = true;
+      req.session.loggedType = result?.type;
       req.session.loggedUsername = result?.username;
       req.session.loggedPassword = req.body.password;
       req.session.cookie.expires = new Date(Date.now() + expireTime);
@@ -170,7 +170,7 @@ app.post("/signUp", async (req, res) => {
 // only for authenticated users
 const authenticatedOnly = (req, res, next) => {
   if (!req.session.GLOBAL_AUTHENTICATED) {
-    res.redirect('/');
+    return res.redirect('/');
   }
   next(); // allow the next route to run
 };
@@ -195,12 +195,12 @@ app.get('/members', async (req, res) => {
   // res.send(HTMLResponse);
 
   const result = await usersModel.findOne({ username: req.session.loggedUsername });
-  res.render('protectedRoute.ejs', {
+  return res.render('protectedRoute.ejs', {
     "x": req.session.loggedUsername,
     "y": imageName1,
     "z": imageName2,
     "w": imageName3,
-    "isAdmin": req.session.loggedType == 'administrator',
+    "isAdmin": req.session.loggedType == 'admin',
     "todos":result?.todos, 
     "navLinks": navLinks
   }
@@ -214,7 +214,7 @@ app.get("/logout", (req, res) => {
   //   <a href='/'>Home</a>
   //   `;
   // res.send(html);
-  res.redirect('/');
+  return res.redirect('/');
 });
 
 app.post('/addNewTodoItem', async (req, res) => {
@@ -226,7 +226,7 @@ app.post('/addNewTodoItem', async (req, res) => {
   } 
 }
   )
-  res.redirect('/members');
+  return res.redirect('/members');
 });
 
 app.post('/deleteTodoItem', async (req, res) => {
@@ -267,8 +267,8 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
   try {
     const result = await usersModel.findOne({ username: req.session.loggedUsername }
     )
-    if (result?.type != 'administrator') {
-      return res.send('<h1> You are not an admin </h1>')
+    if (result?.type != 'admin') {
+      return res.status(403).render('notAdmin.ejs', {navLinks: navLinks});
     }
     next(); // allow the next route to run
   } catch (error) {
@@ -277,12 +277,35 @@ const protectedRouteForAdminsOnlyMiddlewareFunction = async (req, res, next) => 
 };
 app.use(protectedRouteForAdminsOnlyMiddlewareFunction);
 
-app.get('/admin', (req, res) => {
-  res.render('protectedRouteForAdminsOnly.ejs', {navLinks: navLinks, currentURL: url.parse(req.url).pathname})
+app.get('/admin', async (req, res) => {
+  const result = await usersModel.find({});
+  return res.render('admin.ejs', {navLinks: navLinks, users: result});
+});
+
+app.post('/promoteAdmin', async (req, res) => {
+  const userID = req.body.userId;
+  console.log(userID);
+await usersModel.updateOne(
+  { _id: new ObjectId(userID) },
+  { $set: { type: "admin" } }
+);
+console.log("Promoted user");
+res.redirect('/admin');
+});
+
+app.post('/demoteUser', async (req, res) => {
+  const userID = req.body.userId;
+  console.log(userID);
+await usersModel.updateOne(
+  { _id: new ObjectId(userID) },
+  { $set: { type: "user" } }
+);
+console.log("Demoted user");
+res.redirect('/admin');
 });
 
 app.get('*', (req, res) => {
-  res.status(404).render('404.ejs', {navLinks: navLinks});
+  return res.status(404).render('404.ejs', {navLinks: navLinks});
 });
 
 
